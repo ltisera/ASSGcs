@@ -1,0 +1,18 @@
+Definiremos el protocolo que emplearemos para el ASSGcs
+
+el protocolo sera bi-direccional, tanto el cliente, como el servidor,pueden 
+iniciar la transferencia de datos
+
+todos los comandos comenzaran con la secuencia de caracteres "#ID$" en donde
+ID es el ID correspondiente al cliente que envia el mensaje (00 si es el server)
+y finalizara con la secunecia "$ID#"
+por ejemplo, para desplazar la nave
+#01$03xxxxyyyy$01# ---> con este comando indicamos que la nave 01 se desplaza hacia xxxx yyyy
+
+
+Comandos
+01: Informar Login
+02: 
+03: Mover
+21: Dispara Laser
+22: Dispara Misil
