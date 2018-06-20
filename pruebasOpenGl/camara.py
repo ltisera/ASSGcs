@@ -3,6 +3,7 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from math import *
 from functools import partial
+from test import casa
 #el coso se encuentra a 129x 217y
 
 width = 800
