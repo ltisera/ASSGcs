@@ -62,15 +62,15 @@ class cuadrado:
 def inicializar():
 	glMatrixMode(GL_PROJECTION)
 	glLoadIdentity()
-	gluPerspective(60.0,width/heigth,1.0,1000.0)
+	gluPerspective(45.0,width/heigth,0.0,1000.0)
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
 	glPolygonMode ( GL_FRONT, GL_LINE ) 
 
-	glEnable(GL_DEPTH_TEST)
-	glDepthMask(GL_TRUE)
 	glDepthFunc(GL_LEQUAL)
-	glDepthRange(-100.0, 100.0)
+	glEnable(GL_DEPTH_TEST)
+	
+	glDepthRange(1.0, 100.0)
 	
 	gluLookAt(eyeX,eyeY,eyeZ,0,0,0, 0,1,0);
 	glTranslatef(0.0,0.0,0.0);
@@ -107,18 +107,25 @@ def dibujarCuadricula():
 		glVertex3f( -100, 0, (i*10))
 		glVertex3f(100, 0,  (i*10))
 		glEnd()
+	glColor3f(0.41,0.41,0.41)
+	for i in range (-10,10):
+		glBegin(GL_LINES)
+		glVertex3f( (i), 0, -10)
+		glVertex3f( (i), 0, 10)
+		glVertex3f( -10, 0, (i))
+		glVertex3f(10, 0,  (i))
+		glEnd()
 	
 	
 def dibujar(asd):
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-	glEnable(GL_DEPTH_TEST)
 	colBlanc = (1,0,1)
 	glColor(colBlanc)
-	glutSolidSphere(1,10,10)
+	glutSolidSphere(3,10,10)
 
 	dibujarCuadricula()
-	glDisable(GL_DEPTH_TEST)
+
 	
 	
 	glFlush()
@@ -137,9 +144,9 @@ def keyboarEvent(key, x, y):
 	global distanciaCam
 
 	if(key == b'y'):
-		distanciaCam = distanciaCam + 1
+		distanciaCam = distanciaCam + 0.2
 	if(key == b'h'):
-		distanciaCam = distanciaCam - 1
+		distanciaCam = distanciaCam - 0.2
 	if(key == b'u'):
 		py = py + 0.1
 	if(key == b'j'):
