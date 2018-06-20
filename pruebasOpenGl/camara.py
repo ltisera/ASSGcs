@@ -2,7 +2,7 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from math import *
-
+from functools import partial
 #el coso se encuentra a 129x 217y
 
 width = 800
@@ -13,8 +13,8 @@ az = 0.0
 eyeX = 30.0
 eyeY = 10.0
 eyeZ = 30.0
-gradosCamX = 1.0
-gradosCamY = 1.0
+gradosCamX = 45.0
+gradosCamY = 45.0
 distanciaCam = 50
 avanceDeGrados=1
 
@@ -66,6 +66,10 @@ def inicializar():
 	glLoadIdentity()
 	glPolygonMode ( GL_FRONT, GL_LINE ) 
 
+	glEnable(GL_DEPTH_TEST)
+	glDepthMask(GL_TRUE)
+	glDepthFunc(GL_LEQUAL)
+	glDepthRange(-100.0, 100.0)
 	
 	gluLookAt(eyeX,eyeY,eyeZ,0,0,0, 0,1,0);
 	glTranslatef(0.0,0.0,0.0);
@@ -104,13 +108,17 @@ def dibujarCuadricula():
 		glEnd()
 	
 	
-def dibujar():
-	glClear (GL_COLOR_BUFFER_BIT)
+def dibujar(asd):
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-	dibujarCuadricula()
+	glEnable(GL_DEPTH_TEST)
 	colBlanc = (1,0,1)
 	glColor(colBlanc)
 	glutSolidSphere(1,10,10)
+
+	dibujarCuadricula()
+	glDisable(GL_DEPTH_TEST)
+	
 	
 	glFlush()
 
@@ -185,7 +193,7 @@ def keyboarEvent(key, x, y):
 if __name__ == "__main__":
 	ay=0.5;
 	glutInit(sys.argv)
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB)
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH)
 	glutInitWindowPosition(0, 0)
 	glutInitWindowSize(width, heigth)
 	glutCreateWindow("test camara")
@@ -195,7 +203,9 @@ if __name__ == "__main__":
 	lstObjetos=[]
 	
 	lstObjetos.append(miCuad)
-	glutDisplayFunc(dibujar)
+	glutDisplayFunc(partial(dibujar,lstObjetos))
+	glutIdleFunc(partial(dibujar,lstObjetos))
+	
 	glutKeyboardFunc(keyboarEvent)
 	glutMotionFunc(mouseEvent)
 	glutMainLoop()
