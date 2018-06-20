@@ -5,8 +5,8 @@ from math import *
 
 #el coso se encuentra a 129x 217y
 
-width = 500
-heigth = 800
+width = 800
+heigth = 500
 ax= 0.0
 ay= 0.0
 az = 0.0
@@ -16,7 +16,7 @@ eyeZ = 30.0
 gradosCamX = 1.0
 gradosCamY = 1.0
 distanciaCam = 50
-avanceDeGrados=3
+avanceDeGrados=1
 
 px =0.0
 py =0.0
@@ -27,28 +27,41 @@ class cuadrado:
 		self.cx = 0
 		self.cy = 0
 		self.cz = 0
-	def __init__(self, x, y, z):
+		self.size = 1
+		self.color = (1,0,1)
+
+	def __init__(self, x, y, z, size, color):
 		self.cx = x
 		self.cy = y
 		self.cz = z
-	
+		self.size = size
+		self.color = color
 	def getCoordX(self):
 		return self.cx
 	def getCoordY(self):
 		return self.cy
 	def getCoordZ(self):
 		return self.cz
-	def setCoordX(self,x)
+	def setCoordX(self,x):
 		self.cx=x
-	def setCoordY(self,y)
+	def setCoordY(self,y):
 		self.cy=y
-	def setCoordZ(self,z)
+	def setCoordZ(self,z):
 		self.cz=z
+
+
+	def dibujar(self):
+		glBegin(GL_POLYGON)
+		glVertex3f(self.size-cx, self.size+self.cy,cz)
+		glVertex3f(self.size+cx, self.size+self.cy,cz)
+		glVertex3f(self.size+cx, self.size-self.cy,cz)
+		glVertex3f(self.size-cx, self.size-self.cy,cz)
+		glEnd()
 
 def inicializar():
 	glMatrixMode(GL_PROJECTION)
 	glLoadIdentity()
-	gluPerspective(60.0,width/heigth,1.0,100.0)
+	gluPerspective(60.0,width/heigth,1.0,1000.0)
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
 	glPolygonMode ( GL_FRONT, GL_LINE ) 
@@ -58,35 +71,46 @@ def inicializar():
 	glTranslatef(0.0,0.0,0.0);
 	glClearColor(0, 0, 0, 0)
 	
-
-def dibujar():
-	glClear (GL_COLOR_BUFFER_BIT)
+def dibujarCuadricula():
 	glLineWidth(2.5); 
 	glColor3f(1, 0, 0)
 	glBegin(GL_LINES)
 	glVertex3f(0.0, 0.0, 0.0)
-	glVertex3f(10, 0, 0)
+	glVertex3f(100, 0, 0)
 	glEnd()
 	
 	glColor3f(0.0, 1.0, 0.0)
 	glBegin(GL_LINES)
 	glVertex3f(0.0, 0.0, 0.0)
-	glVertex3f(0, 10, 0)
+	glVertex3f(0, 100, 0)
 	glEnd()
 	
 	glColor3f(0,0,1)
 	glBegin(GL_LINES)
 	glVertex3f(0.0, 0, 0.0)
-	glVertex3f(0, 0, 10)
+	glVertex3f(0, 0, 100)
 	glEnd()
+	
 	
 	glColor3f(1,1,1)
-	glBegin(GL_POINTS)
-	glVertex3f(px, py, pz)
-	glEnd()
 	glLineWidth(1); 
+
+	for i in range (-10,10):
+		glBegin(GL_LINES)
+		glVertex3f( (i*10), 0, -100)
+		glVertex3f( (i*10), 0, 100)
+		glVertex3f( -100, 0, (i*10))
+		glVertex3f(100, 0,  (i*10))
+		glEnd()
 	
-	glutWireSphere(3,10,10)
+	
+def dibujar():
+	glClear (GL_COLOR_BUFFER_BIT)
+
+	dibujarCuadricula()
+	colBlanc = (1,0,1)
+	glColor(colBlanc)
+	glutSolidSphere(1,10,10)
 	
 	glFlush()
 
@@ -104,9 +128,9 @@ def keyboarEvent(key, x, y):
 	global distanciaCam
 
 	if(key == b'y'):
-		distanciaCam = distanciaCam + 0.1
+		distanciaCam = distanciaCam + 1
 	if(key == b'h'):
-		distanciaCam = distanciaCam - 0.1
+		distanciaCam = distanciaCam - 1
 	if(key == b'u'):
 		py = py + 0.1
 	if(key == b'j'):
@@ -117,26 +141,31 @@ def keyboarEvent(key, x, y):
 		pz = pz - 0.1
 
 	if(key == b'w'):
+		gradosCamX = gradosCamX - avanceDeGrados
 		if(gradosCamX <= 0):
 			gradosCamX = 360
-		gradosCamX = gradosCamX - avanceDeGrados
+		
 		
 	if(key == b's'):
+		gradosCamX = gradosCamX +avanceDeGrados
 		if(gradosCamX >= 360):
 			gradosCamX = 0
-		gradosCamX = gradosCamX +avanceDeGrados
+		
 	
 	if(key == b'd'):
+		gradosCamY = gradosCamY -avanceDeGrados
 		if(gradosCamY <= 0):
 			gradosCamY = 360
-		gradosCamY = gradosCamY -avanceDeGrados
+		
 		
 	if(key == b'a'):
+		gradosCamY = gradosCamY +avanceDeGrados
 		if(gradosCamY >= 360):
 			gradosCamY = 0
-		gradosCamY = gradosCamY +avanceDeGrados
+		
 	if(gradosCamX == 0):
-		gradosCamX = 1
+		gradosCamX = 0.01
+	
 	eyeX = distanciaCam*sin(radians(gradosCamX))*cos(radians(gradosCamY))
 	eyeY = distanciaCam*cos(radians(gradosCamX))
 	eyeZ = distanciaCam*sin(radians(gradosCamX))*sin(radians(gradosCamY))
@@ -145,9 +174,9 @@ def keyboarEvent(key, x, y):
 	glLoadIdentity()
 	if(gradosCamX <=180):
 
-		gluLookAt(30,10,30,eyeX,eyeY,eyeZ,0,1,0);
+		gluLookAt(eyeX,eyeY,eyeZ,0,0,0,0,1,0);
 	else:
-		gluLookAt(30,10,30,eyeX,eyeY,eyeZ,0,1,0);
+		gluLookAt(eyeX,eyeY,eyeZ,0,0,0,0,-1,0);
 	print("grados X: ", gradosCamX," grados Y: ", gradosCamY)
 	glutPostRedisplay();
 
@@ -161,6 +190,11 @@ if __name__ == "__main__":
 	glutInitWindowSize(width, heigth)
 	glutCreateWindow("test camara")
 	inicializar()
+
+	miCuad=cuadrado(0,0,0,1,(1,1,1))
+	lstObjetos=[]
+	
+	lstObjetos.append(miCuad)
 	glutDisplayFunc(dibujar)
 	glutKeyboardFunc(keyboarEvent)
 	glutMotionFunc(mouseEvent)
