@@ -3,7 +3,7 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from math import *
 from functools import partial
-from test import casa
+from auxiliares import dibujarCuadricula
 #el coso se encuentra a 129x 217y
 
 width = 800
@@ -52,69 +52,37 @@ class cuadrado:
 
 
 	def dibujar(self):
+		glColor3f(1, 1, 1)
 		glBegin(GL_POLYGON)
-		glVertex3f(self.size-cx, self.size+self.cy,cz)
-		glVertex3f(self.size+cx, self.size+self.cy,cz)
-		glVertex3f(self.size+cx, self.size-self.cy,cz)
-		glVertex3f(self.size-cx, self.size-self.cy,cz)
+		print("size: ", self.size, ", cx: ", self.cx, ", cy: ", self.cy, ", cz: ", self.cz)
+		print("cordenadas v1: ", (self.cx - self.size) , ",",(self.cy + self.size) , ",", self.cz)
+		print("cordenadas v2: ", (self.cx + self.size) , ",",(self.cy + self.size) , ",", self.cz)
+		print("cordenadas v3: ", (self.cx + self.size) , ",",(self.cy - self.size) , ",", self.cz)
+		print("cordenadas v4: ", (self.cx - self.size) , ",",(self.cy - self.size) , ",", self.cz)
+		glVertex3f(self.cx - self.size, self.cy + self.size,self.cz)
+		glVertex3f(self.cx + self.size, self.cy + self.size,self.cz)
+		glVertex3f(self.cx + self.size, self.cy - self.size,self.cz)
+		glVertex3f(self.cx - self.size, self.cy - self.size,self.cz)
 		glEnd()
 
 def inicializar():
 	glMatrixMode(GL_PROJECTION)
 	glLoadIdentity()
-	gluPerspective(45.0,width/heigth,0.0,1000.0)
+	gluPerspective(45.0,width/heigth,1,200)
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
 	glPolygonMode ( GL_FRONT, GL_LINE ) 
 
-	glDepthFunc(GL_LEQUAL)
-	glEnable(GL_DEPTH_TEST)
-	
-	glDepthRange(1.0, 100.0)
+	glDepthMask(GL_TRUE);
+	glClearDepth(1.0);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glDepthRange(0, 1)
 	
 	gluLookAt(eyeX,eyeY,eyeZ,0,0,0, 0,1,0);
 	glTranslatef(0.0,0.0,0.0);
 	glClearColor(0, 0, 0, 0)
 	
-def dibujarCuadricula():
-	glLineWidth(2.5); 
-	glColor3f(1, 0, 0)
-	glBegin(GL_LINES)
-	glVertex3f(0.0, 0.0, 0.0)
-	glVertex3f(100, 0, 0)
-	glEnd()
-	
-	glColor3f(0.0, 1.0, 0.0)
-	glBegin(GL_LINES)
-	glVertex3f(0.0, 0.0, 0.0)
-	glVertex3f(0, 100, 0)
-	glEnd()
-	
-	glColor3f(0,0,1)
-	glBegin(GL_LINES)
-	glVertex3f(0.0, 0, 0.0)
-	glVertex3f(0, 0, 100)
-	glEnd()
-	
-	
-	glColor3f(1,1,1)
-	glLineWidth(1); 
-
-	for i in range (-10,10):
-		glBegin(GL_LINES)
-		glVertex3f( (i*10), 0, -100)
-		glVertex3f( (i*10), 0, 100)
-		glVertex3f( -100, 0, (i*10))
-		glVertex3f(100, 0,  (i*10))
-		glEnd()
-	glColor3f(0.41,0.41,0.41)
-	for i in range (-10,10):
-		glBegin(GL_LINES)
-		glVertex3f( (i), 0, -10)
-		glVertex3f( (i), 0, 10)
-		glVertex3f( -10, 0, (i))
-		glVertex3f(10, 0,  (i))
-		glEnd()
 	
 	
 def dibujar(asd):
@@ -122,11 +90,12 @@ def dibujar(asd):
 
 	colBlanc = (1,0,1)
 	glColor(colBlanc)
-	glutSolidSphere(3,10,10)
-
+	#glutSolidSphere(3,10,10)
+	for i in asd:
+		i.dibujar()
 	dibujarCuadricula()
 
-	
+	glutSwapBuffers();
 	
 	glFlush()
 
@@ -201,18 +170,18 @@ def keyboarEvent(key, x, y):
 if __name__ == "__main__":
 	ay=0.5;
 	glutInit(sys.argv)
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH)
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
 	glutInitWindowPosition(0, 0)
 	glutInitWindowSize(width, heigth)
 	glutCreateWindow("test camara")
 	inicializar()
 
-	miCuad=cuadrado(0,0,0,1,(1,1,1))
+	miCuad=cuadrado(1,1,1,1,(1,1,1))
 	lstObjetos=[]
 	
 	lstObjetos.append(miCuad)
 	glutDisplayFunc(partial(dibujar,lstObjetos))
-	glutIdleFunc(partial(dibujar,lstObjetos))
+	#glutIdleFunc(partial(dibujar,lstObjetos))
 	
 	glutKeyboardFunc(keyboarEvent)
 	glutMotionFunc(mouseEvent)
