@@ -54,11 +54,6 @@ class cuadrado:
 	def dibujar(self):
 		glColor3f(1, 1, 1)
 		glBegin(GL_POLYGON)
-		print("size: ", self.size, ", cx: ", self.cx, ", cy: ", self.cy, ", cz: ", self.cz)
-		print("cordenadas v1: ", (self.cx - self.size) , ",",(self.cy + self.size) , ",", self.cz)
-		print("cordenadas v2: ", (self.cx + self.size) , ",",(self.cy + self.size) , ",", self.cz)
-		print("cordenadas v3: ", (self.cx + self.size) , ",",(self.cy - self.size) , ",", self.cz)
-		print("cordenadas v4: ", (self.cx - self.size) , ",",(self.cy - self.size) , ",", self.cz)
 		glVertex3f(self.cx - self.size, self.cy + self.size,self.cz)
 		glVertex3f(self.cx + self.size, self.cy + self.size,self.cz)
 		glVertex3f(self.cx + self.size, self.cy - self.size,self.cz)
@@ -92,7 +87,13 @@ def dibujar(asd):
 	glColor(colBlanc)
 	#glutSolidSphere(3,10,10)
 	for i in asd:
+		glPushMatrix()
+		glTranslatef(2, 0, 0)
 		i.dibujar()
+		
+		glPopMatrix()
+
+	
 	dibujarCuadricula()
 
 	glutSwapBuffers();
@@ -150,7 +151,7 @@ def keyboarEvent(key, x, y):
 		
 	if(gradosCamX == 0):
 		gradosCamX = 0.01
-	
+
 	eyeX = distanciaCam*sin(radians(gradosCamX))*cos(radians(gradosCamY))
 	eyeY = distanciaCam*cos(radians(gradosCamX))
 	eyeZ = distanciaCam*sin(radians(gradosCamX))*sin(radians(gradosCamY))
@@ -167,13 +168,14 @@ def keyboarEvent(key, x, y):
 
 
 
+
 if __name__ == "__main__":
 	ay=0.5;
 	glutInit(sys.argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
 	glutInitWindowPosition(0, 0)
 	glutInitWindowSize(width, heigth)
-	glutCreateWindow("test camara")
+	app = glutCreateWindow("test camara")
 	inicializar()
 
 	miCuad=cuadrado(1,1,1,1,(1,1,1))
