@@ -6,6 +6,7 @@ from functools import partial
 from auxiliares import dibujarCuadricula
 #el coso se encuentra a 129x 217y
 
+lstObjetos = []
 width = 800
 heigth = 500
 ax= 0.0
@@ -18,11 +19,15 @@ gradosCamX = 45.0
 gradosCamY = 45.0
 distanciaCam = 50
 avanceDeGrados=1
+acum = 0
 
 px =0.0
 py =0.0
 pz =0.0
 
+mx = 0.0
+my = 0.0
+mz = 0.0
 class cuadrado:
 	def __init__(self):
 		self.cx = 0
@@ -37,6 +42,12 @@ class cuadrado:
 		self.cz = z
 		self.size = size
 		self.color = color
+		self.tx = 0
+		self.ty = 0
+		self.tz = 0
+	def getTrans(self):
+		print("devuelvo {0},{1},{2}".format(self.tx,self.ty,self.tz))
+		return self.tx,self.ty,self.tz
 	def getCoordX(self):
 		return self.cx
 	def getCoordY(self):
@@ -50,15 +61,25 @@ class cuadrado:
 	def setCoordZ(self,z):
 		self.cz=z
 
-
+	def mover(self,x, y, z):
+		print("value")
+		print("Guardo: {},{},{}",x,y,z)
+		self.tx = x
+		self.ty = y
+		self.tz = z
 	def dibujar(self):
+		glPushMatrix()
+		print("mx:", self.tx," my:", self.ty," mz:", self.tz)
+		glTranslatef(self.tx, self.ty, self.tz)
 		glColor3f(1, 1, 1)
 		glBegin(GL_POLYGON)
 		glVertex3f(self.cx - self.size, self.cy + self.size,self.cz)
 		glVertex3f(self.cx + self.size, self.cy + self.size,self.cz)
 		glVertex3f(self.cx + self.size, self.cy - self.size,self.cz)
 		glVertex3f(self.cx - self.size, self.cy - self.size,self.cz)
+		
 		glEnd()
+		glPopMatrix()
 
 def inicializar():
 	glMatrixMode(GL_PROJECTION)
@@ -80,19 +101,17 @@ def inicializar():
 	
 	
 	
-def dibujar(asd):
+def dibujar():
+	global lstObjetos
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
 	colBlanc = (1,0,1)
 	glColor(colBlanc)
 	#glutSolidSphere(3,10,10)
-	for i in asd:
-		glPushMatrix()
-		glTranslatef(2, 0, 0)
+	for i in lstObjetos:
 		i.dibujar()
 		
-		glPopMatrix()
-
+		
 	
 	dibujarCuadricula()
 
@@ -103,6 +122,7 @@ def dibujar(asd):
 def mouseEvent(x, y):
 	print("X: ",x, " Y:", y)
 def keyboarEvent(key, x, y):
+	global lstObjetos
 	global eyeX
 	global eyeY
 	global eyeZ
@@ -111,11 +131,15 @@ def keyboarEvent(key, x, y):
 	global px
 	global py
 	global pz
+	global mx
+	global my
+	global mz
 	global distanciaCam
-
-	if(key == b'y'):
+	global acum
+	print ("La key es:", key)
+	if(key == b'-'):
 		distanciaCam = distanciaCam + 0.2
-	if(key == b'h'):
+	if(key == b'+'):
 		distanciaCam = distanciaCam - 0.2
 	if(key == b'u'):
 		py = py + 0.1
@@ -126,31 +150,52 @@ def keyboarEvent(key, x, y):
 	if(key == b'k'):
 		pz = pz - 0.1
 
-	if(key == b'w'):
+	if(key == GLUT_KEY_UP):
 		gradosCamX = gradosCamX - avanceDeGrados
 		if(gradosCamX <= 0):
 			gradosCamX = 360
 		
 		
-	if(key == b's'):
+	if(key == GLUT_KEY_DOWN):
 		gradosCamX = gradosCamX +avanceDeGrados
 		if(gradosCamX >= 360):
 			gradosCamX = 0
 		
 	
-	if(key == b'd'):
+	if(key == GLUT_KEY_RIGHT):
 		gradosCamY = gradosCamY -avanceDeGrados
 		if(gradosCamY <= 0):
 			gradosCamY = 360
 		
 		
-	if(key == b'a'):
+	if(key == GLUT_KEY_LEFT):
 		gradosCamY = gradosCamY +avanceDeGrados
 		if(gradosCamY >= 360):
 			gradosCamY = 0
-		
+	if(key == b'a'):
+		for i in lstObjetos:
+			(x,y,z) = i.getTrans()
+			i.mover(x-0.1,y,z)
+
+	if(key == b'd'):
+		for i in lstObjetos:
+			(x,y,z) = i.getTrans()
+			i.mover(x+0.1,y,z)
+
+	if(key == b'w'):
+		for i in lstObjetos:
+			(x,y,z) = i.getTrans()
+			i.mover(x,y+0.1,z)
+
+	if(key == b's'):
+		for i in lstObjetos:
+			(x,y,z) = i.getTrans()
+			i.mover(x,y-0.1,z)
+
 	if(gradosCamX == 0):
 		gradosCamX = 0.01
+
+
 
 	eyeX = distanciaCam*sin(radians(gradosCamX))*cos(radians(gradosCamY))
 	eyeY = distanciaCam*cos(radians(gradosCamX))
@@ -158,14 +203,24 @@ def keyboarEvent(key, x, y):
 	
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
+
+	if (key == b'x'):
+		acum = acum + 1
+		eyeX= eyeX + acum
+		mx = mx + 1
+	if (key == b'z'):
+		acum = acum - 1
+		eyeX= eyeX+acum
+		mx = mx - 1
+
 	if(gradosCamX <=180):
 
-		gluLookAt(eyeX,eyeY,eyeZ,0,0,0,0,1,0);
+		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,1,0);
 	else:
-		gluLookAt(eyeX,eyeY,eyeZ,0,0,0,0,-1,0);
-	print("grados X: ", gradosCamX," grados Y: ", gradosCamY)
-	glutPostRedisplay();
-
+		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,-1,0);
+	glutPostRedisplay()
+	if(key == b'\x1b'):
+		glutDestroyWindow(app)
 
 
 
@@ -179,13 +234,15 @@ if __name__ == "__main__":
 	inicializar()
 
 	miCuad=cuadrado(1,1,1,1,(1,1,1))
-	lstObjetos=[]
+	
 	
 	lstObjetos.append(miCuad)
-	glutDisplayFunc(partial(dibujar,lstObjetos))
-	#glutIdleFunc(partial(dibujar,lstObjetos))
+	glutDisplayFunc(dibujar)
+	#glutIdleFunc(dibujar)
 	
 	glutKeyboardFunc(keyboarEvent)
+	glutSpecialFunc(keyboarEvent)
+	
 	glutMotionFunc(mouseEvent)
 	glutMainLoop()
 	
