@@ -131,6 +131,18 @@ def dibujar():
 	
 	glFlush()
 
+def mouseClickEvent(mouse, state, x ,y):
+	global mPosXOld 
+	global mPosYOld 
+	if(mouse == GLUT_LEFT_BUTTON and state == GLUT_DOWN):
+		print ("apreto")
+		mPosXOld = x
+		mPosYOld = y
+	if(mouse == GLUT_LEFT_BUTTON and state == GLUT_UP):
+		mPosXOld = x
+		mPosYOld = y
+		print ("solto")
+
 def mouseEvent(x, y):
 	global mPosXOld 
 	global mPosYOld 
@@ -148,14 +160,14 @@ def mouseEvent(x, y):
 	dy = 0
 	if(mPosXOld != None and mPosYOld != None):
 		dx = x - mPosXOld
-		dy = y - mPosYOld
+		dy = -(y - mPosYOld)
 	else:
 		mPosXOld = x
 		mPosYOld = y
 	#print("X: {} D: {} y las Anteriores X: {} Y:{}".format(x,y,mPosXOld,mPosYOld))
 	
-	gradosCamX = (gradosCamX +dy )
-	gradosCamY = (gradosCamY +dx)
+	gradosCamX = (gradosCamX +(dy*0.5) )
+	gradosCamY = (gradosCamY +(dx*0.5) )
 	eyeX = distanciaCam*sin(radians(gradosCamX))*cos(radians(gradosCamY))
 	eyeY = distanciaCam*cos(radians(gradosCamX))
 	eyeZ = distanciaCam*sin(radians(gradosCamX))*sin(radians(gradosCamY))
@@ -293,7 +305,7 @@ if __name__ == "__main__":
 	
 	glutKeyboardFunc(keyboarEvent)
 	glutSpecialFunc(keyboarEvent)
-	
+	glutMouseFunc(mouseClickEvent)
 	glutMotionFunc(mouseEvent)
 	glutMainLoop()
 """
