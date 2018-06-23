@@ -5,7 +5,8 @@ from math import *
 from functools import partial
 from auxiliares import dibujarCuadricula
 #el coso se encuentra a 129x 217y
-
+mPosXOld = None
+mPosYOld = None
 lstObjetos = []
 width = 800
 heigth = 500
@@ -28,6 +29,18 @@ pz =0.0
 mx = 0.0
 my = 0.0
 mz = 0.0
+
+class camara:
+	def __init__(self):
+		self.xCam = 0.0
+		self.yCam = 0.0
+		self.zCam = 0.0
+		self.xPOI = 0.0
+		self.yPOI = 0.0
+		self.zPOI = 0.0
+		self.anguloApertura = 45.0
+
+
 class cuadrado:
 	def __init__(self):
 		self.cx = 0
@@ -69,7 +82,6 @@ class cuadrado:
 		self.tz = z
 	def dibujar(self):
 		glPushMatrix()
-		print("mx:", self.tx," my:", self.ty," mz:", self.tz)
 		glTranslatef(self.tx, self.ty, self.tz)
 		glColor3f(1, 1, 1)
 		glBegin(GL_POLYGON)
@@ -120,7 +132,40 @@ def dibujar():
 	glFlush()
 
 def mouseEvent(x, y):
-	print("X: ",x, " Y:", y)
+	global mPosXOld 
+	global mPosYOld 
+	global gradosCamX
+	global gradosCamY
+	global distanciaCam
+	global eyeX
+	global eyeY
+	global eyeZ
+	global mx
+	global my
+	global mz
+
+	dx = 0
+	dy = 0
+	if(mPosXOld != None and mPosYOld != None):
+		dx = x - mPosXOld
+		dy = y - mPosYOld
+	else:
+		mPosXOld = x
+		mPosYOld = y
+	#print("X: {} D: {} y las Anteriores X: {} Y:{}".format(x,y,mPosXOld,mPosYOld))
+	
+	gradosCamX = (gradosCamX +dy )
+	gradosCamY = (gradosCamY +dx)
+	eyeX = distanciaCam*sin(radians(gradosCamX))*cos(radians(gradosCamY))
+	eyeY = distanciaCam*cos(radians(gradosCamX))
+	eyeZ = distanciaCam*sin(radians(gradosCamX))*sin(radians(gradosCamY))
+	glMatrixMode(GL_MODELVIEW)
+	glLoadIdentity()
+	gluLookAt(eyeX,eyeY,eyeZ,0,0,0,0,1,0);
+	glutPostRedisplay()
+	mPosXOld = x
+	mPosYOld = y
+
 def keyboarEvent(key, x, y):
 	global lstObjetos
 	global eyeX
@@ -136,20 +181,11 @@ def keyboarEvent(key, x, y):
 	global mz
 	global distanciaCam
 	global acum
-	print ("La key es:", key)
 	if(key == b'-'):
 		distanciaCam = distanciaCam + 0.2
 	if(key == b'+'):
 		distanciaCam = distanciaCam - 0.2
-	if(key == b'u'):
-		py = py + 0.1
-	if(key == b'j'):
-		py = py - 0.1
-	if(key == b'i'):
-		pz = pz + 0.1
-	if(key == b'k'):
-		pz = pz - 0.1
-
+	
 	if(key == GLUT_KEY_UP):
 		gradosCamX = gradosCamX - avanceDeGrados
 		if(gradosCamX <= 0):
@@ -157,6 +193,7 @@ def keyboarEvent(key, x, y):
 		
 		
 	if(key == GLUT_KEY_DOWN):
+		print("eyeX:", eyeX, "eyeY:", eyeY, "eyeZ:", eyeZ )
 		gradosCamX = gradosCamX +avanceDeGrados
 		if(gradosCamX >= 360):
 			gradosCamX = 0
@@ -195,7 +232,7 @@ def keyboarEvent(key, x, y):
 	if(gradosCamX == 0):
 		gradosCamX = 0.01
 
-
+	print("DX:{}, DY:{}".format(gradosCamX,gradosCamY))
 
 	eyeX = distanciaCam*sin(radians(gradosCamX))*cos(radians(gradosCamY))
 	eyeY = distanciaCam*cos(radians(gradosCamX))
@@ -203,6 +240,10 @@ def keyboarEvent(key, x, y):
 	
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
+	
+
+
+
 
 	if (key == b'x'):
 		acum = acum + 1
@@ -213,11 +254,21 @@ def keyboarEvent(key, x, y):
 		eyeX= eyeX+acum
 		mx = mx - 1
 
-	if(gradosCamX <=180):
+	"""if(gradosCamX <=180):
 
 		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,1,0);
 	else:
-		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,-1,0);
+		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,-1,0);"""
+	v1=mx-eyeX
+	v2=my-eyeY
+	v3=mz-eyeZ
+	if(eyeY>=0):
+		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,1,0);
+	else:
+		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,1,0);
+	
+	
+
 	glutPostRedisplay()
 	if(key == b'\x1b'):
 		glutDestroyWindow(app)
@@ -245,4 +296,19 @@ if __name__ == "__main__":
 	
 	glutMotionFunc(mouseEvent)
 	glutMainLoop()
-	
+"""
+v1 = eyeX-mx, eyeY-my,eyeZ-mz
+
+vPerp = -(eyeY-my),eyeX-mx,0
+
+v1 * v2 = (vx,vy,vz) * (ux,uy,uz)
+
+vx*ux+vy*uy+vz*uz = 0
+
+(eyeX-mx )x + (eyeY-my)y + (eyeZ-mz)z = 0 
+
+
+-Bx+Ay
+
+
+"""
