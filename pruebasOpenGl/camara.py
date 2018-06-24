@@ -10,25 +10,37 @@ mPosYOld = None
 lstObjetos = []
 width = 800
 heigth = 500
-ax= 0.0
-ay= 0.0
-az = 0.0
-eyeX = 30.0
-eyeY = 10.0
-eyeZ = 30.0
-gradosCamX = 45.0
-gradosCamY = 45.0
-distanciaCam = 50
-avanceDeGrados=1
-acum = 0
 
-px =0.0
-py =0.0
-pz =0.0
-
+eyeX = 0.0
+eyeY = 0.0
+eyeZ = 0.0
 mx = 0.0
 my = 0.0
 mz = 0.0
+gradosTheta = 0
+gradosFi = 0
+distanciaCam = 0
+avanceDeGrados= 1
+
+"""def cartesianoAEsferico(x,y,z):
+	No funca
+	if (y!=0):
+		theta = degrees(atan(sqrt((pow(x,2)+pow(z,2))/y)))
+	else:
+		theta = 90
+	if(x!=0):
+		fi = degrees(atan(z/x))
+	else:
+		fi = 90
+	r = sqrt((x*x)+(y*y)+(z*z))
+	#r = distaciaCam ; theta = gradosTheta ; fi = gradosFi
+	return r, theta, fi"""
+
+def esfericoACartesiano(r,theta,fi):
+	x = r*sin(radians(theta))*cos(radians(fi))
+	y = r*cos(radians(theta))
+	z = r*sin(radians(theta))*sin(radians(fi))
+	return x, y, z
 
 class camara:
 	def __init__(self):
@@ -59,7 +71,7 @@ class cuadrado:
 		self.ty = 0
 		self.tz = 0
 	def getTrans(self):
-		print("devuelvo {0},{1},{2}".format(self.tx,self.ty,self.tz))
+		#print("devuelvo {0},{1},{2}".format(self.tx,self.ty,self.tz))
 		return self.tx,self.ty,self.tz
 	def getCoordX(self):
 		return self.cx
@@ -75,8 +87,8 @@ class cuadrado:
 		self.cz=z
 
 	def mover(self,x, y, z):
-		print("value")
-		print("Guardo: {},{},{}",x,y,z)
+		#print("value")
+		#print("Guardo: {},{},{}",x,y,z)
 		self.tx = x
 		self.ty = y
 		self.tz = z
@@ -94,6 +106,16 @@ class cuadrado:
 		glPopMatrix()
 
 def inicializar():
+	global eyeX
+	global eyeY
+	global eyeZ
+	global gradosTheta
+	global gradosFi
+	global mx
+	global my
+	global mz
+	global distanciaCam
+
 	glMatrixMode(GL_PROJECTION)
 	glLoadIdentity()
 	gluPerspective(45.0,width/heigth,1,200)
@@ -107,7 +129,18 @@ def inicializar():
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0, 1)
 	
-	gluLookAt(eyeX,eyeY,eyeZ,0,0,0, 0,1,0);
+	eyeX = 30.0
+	eyeY = 30.0
+	eyeZ = 30.0
+	distanciaCam = 52
+	gradosTheta = 56
+	gradosFi = 45
+	if (gradosTheta <= 180):
+		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz, 0,1,0)
+	else:
+		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz, 0,-1,0)
+	print("INICIO {0:.6f};{1:.6f};{2:.6f} dist {3:.6f}; Theta {4:.6f}; Fi {5:.6f}".format(eyeX,eyeY,eyeZ,distanciaCam,gradosTheta,gradosFi))
+	
 	glTranslatef(0.0,0.0,0.0);
 	glClearColor(0, 0, 0, 0)
 	
@@ -122,10 +155,20 @@ def dibujar():
 	#glutSolidSphere(3,10,10)
 	for i in lstObjetos:
 		i.dibujar()
-		
-		
 	
 	dibujarCuadricula()
+
+	#Mira
+	glLineWidth(2.5); 
+	glColor3f(1, 0.5, 1)
+	glBegin(GL_LINES)
+	glVertex3f(mx-2, my, mz)
+	glVertex3f(mx+2, my, mz)
+	glVertex3f(mx, my-2, mz)
+	glVertex3f(mx, my+2, mz)
+	glVertex3f(mx, my, mz-2)
+	glVertex3f(mx, my, mz+2)
+	glEnd()
 
 	glutSwapBuffers();
 	
@@ -146,8 +189,8 @@ def mouseClickEvent(mouse, state, x ,y):
 def mouseEvent(x, y):
 	global mPosXOld 
 	global mPosYOld 
-	global gradosCamX
-	global gradosCamY
+	global gradosTheta
+	global gradosFi
 	global distanciaCam
 	global eyeX
 	global eyeY
@@ -166,14 +209,12 @@ def mouseEvent(x, y):
 		mPosYOld = y
 	#print("X: {} D: {} y las Anteriores X: {} Y:{}".format(x,y,mPosXOld,mPosYOld))
 	
-	gradosCamX = (gradosCamX +(dy*0.5) )
-	gradosCamY = (gradosCamY +(dx*0.5) )
-	eyeX = distanciaCam*sin(radians(gradosCamX))*cos(radians(gradosCamY))
-	eyeY = distanciaCam*cos(radians(gradosCamX))
-	eyeZ = distanciaCam*sin(radians(gradosCamX))*sin(radians(gradosCamY))
+	gradosTheta += dy*0.5
+	gradosFi += dx*0.5
+	eyeX,eyeY,eyeZ = esfericoACartesiano(distanciaCam,gradosTheta,gradosFi)
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
-	gluLookAt(eyeX,eyeY,eyeZ,0,0,0,0,1,0);
+	gluLookAt(eyeX+mx,eyeY+my,eyeZ+mz,mx,my,mz,0,1,0);
 	glutPostRedisplay()
 	mPosXOld = x
 	mPosYOld = y
@@ -183,44 +224,40 @@ def keyboarEvent(key, x, y):
 	global eyeX
 	global eyeY
 	global eyeZ
-	global gradosCamX
-	global gradosCamY
-	global px
-	global py
-	global pz
+	global gradosTheta
+	global gradosFi
 	global mx
 	global my
 	global mz
 	global distanciaCam
-	global acum
 	if(key == b'-'):
 		distanciaCam = distanciaCam + 0.2
 	if(key == b'+'):
 		distanciaCam = distanciaCam - 0.2
 	
 	if(key == GLUT_KEY_UP):
-		gradosCamX = gradosCamX - avanceDeGrados
-		if(gradosCamX <= 0):
-			gradosCamX = 360
+		gradosTheta = gradosTheta - avanceDeGrados
+		if(gradosTheta <= 0):
+			gradosTheta = 360
 		
 		
 	if(key == GLUT_KEY_DOWN):
-		print("eyeX:", eyeX, "eyeY:", eyeY, "eyeZ:", eyeZ )
-		gradosCamX = gradosCamX +avanceDeGrados
-		if(gradosCamX >= 360):
-			gradosCamX = 0
+		#print("eyeX:", eyeX, "eyeY:", eyeY, "eyeZ:", eyeZ )
+		gradosTheta = gradosTheta +avanceDeGrados
+		if(gradosTheta >= 360):
+			gradosTheta = 0
 		
 	
 	if(key == GLUT_KEY_RIGHT):
-		gradosCamY = gradosCamY -avanceDeGrados
-		if(gradosCamY <= 0):
-			gradosCamY = 360
+		gradosFi = gradosFi -avanceDeGrados
+		if(gradosFi <= 0):
+			gradosFi = 360
 		
 		
 	if(key == GLUT_KEY_LEFT):
-		gradosCamY = gradosCamY +avanceDeGrados
-		if(gradosCamY >= 360):
-			gradosCamY = 0
+		gradosFi = gradosFi +avanceDeGrados
+		if(gradosFi >= 360):
+			gradosFi = 0
 	if(key == b'a'):
 		for i in lstObjetos:
 			(x,y,z) = i.getTrans()
@@ -241,46 +278,31 @@ def keyboarEvent(key, x, y):
 			(x,y,z) = i.getTrans()
 			i.mover(x,y-0.1,z)
 
-	if(gradosCamX == 0):
-		gradosCamX = 0.01
+	if(gradosTheta == 0):
+		gradosTheta = 0.01
 
-	print("DX:{}, DY:{}".format(gradosCamX,gradosCamY))
-
-	eyeX = distanciaCam*sin(radians(gradosCamX))*cos(radians(gradosCamY))
-	eyeY = distanciaCam*cos(radians(gradosCamX))
-	eyeZ = distanciaCam*sin(radians(gradosCamX))*sin(radians(gradosCamY))
+	#print("DX:{}, DY:{}".format(gradosTheta,gradosFi))
+	
+	eyeX,eyeY,eyeZ = esfericoACartesiano(distanciaCam,gradosTheta,gradosFi)
+	print("{0:.6f};{1:.6f};{2:.6f} dist {3:.6f}; Theta {4:.6f}; Fi {5:.6f}".format(eyeX,eyeY,eyeZ,distanciaCam,gradosTheta,gradosFi))
 	
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
-	
-
-
 
 
 	if (key == b'x'):
-		acum = acum + 1
-		eyeX= eyeX + acum
-		mx = mx + 1
+		eyeX += 1
+		mx += 1
+
 	if (key == b'z'):
-		acum = acum - 1
-		eyeX= eyeX+acum
-		mx = mx - 1
+		eyeX -= 1
+		mx -= 1
 
-	"""if(gradosCamX <=180):
-
-		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,1,0);
+	if(gradosTheta<=180):
+		gluLookAt(eyeX+mx,eyeY+my,eyeZ+mz,mx,my,mz,0,1,0);
 	else:
-		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,-1,0);"""
-	v1=mx-eyeX
-	v2=my-eyeY
-	v3=mz-eyeZ
-	if(eyeY>=0):
-		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,1,0);
-	else:
-		gluLookAt(eyeX,eyeY,eyeZ,mx,my,mz,0,1,0);
+		gluLookAt(eyeX+mx,eyeY+my,eyeZ+mz,mx,my,mz,0,-1,0);
 	
-	
-
 	glutPostRedisplay()
 	if(key == b'\x1b'):
 		glutDestroyWindow(app)
