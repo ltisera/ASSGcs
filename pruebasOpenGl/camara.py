@@ -211,10 +211,25 @@ def mouseEvent(x, y):
 	
 	gradosTheta += dy*0.5
 	gradosFi += dx*0.5
+	
+	if(gradosTheta >= 360):
+		gradosTheta = 0.1
+	if(gradosTheta <= 0):
+		gradosTheta = 360
+	"""
+	if(gradosFi >= 360):
+		gradosFi = 0
+	if(gradosFi <= 0):
+		gradosFi = 360
+	"""
 	eyeX,eyeY,eyeZ = esfericoACartesiano(distanciaCam,gradosTheta,gradosFi)
+	print("{0:.6f};{1:.6f};{2:.6f} dist {3:.6f}; Theta {4:.6f}; Fi {5:.6f}".format(eyeX,eyeY,eyeZ,distanciaCam,gradosTheta,gradosFi))
 	glMatrixMode(GL_MODELVIEW)
 	glLoadIdentity()
-	gluLookAt(eyeX+mx,eyeY+my,eyeZ+mz,mx,my,mz,0,1,0);
+	if(gradosTheta<=180):
+		gluLookAt(eyeX+mx,eyeY+my,eyeZ+mz,mx,my,mz,0,1,0);
+	else:
+		gluLookAt(eyeX+mx,eyeY+my,eyeZ+mz,mx,my,mz,0,-1,0);
 	glutPostRedisplay()
 	mPosXOld = x
 	mPosYOld = y
