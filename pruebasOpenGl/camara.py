@@ -2,7 +2,6 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from math import *
-from functools import partial
 from auxiliares import dibujarCuadricula
 # el coso se encuentra a 129x 217y
 mPosXOld = None
@@ -20,7 +19,7 @@ mz = 0.0
 gradosTheta = 0
 gradosFi = 0
 distanciaCam = 0
-avanceDeGrados= 1
+avanceDeGrados = 1
 
 """def cartesianoAEsferico(x,y,z):
     No funca
@@ -36,11 +35,13 @@ avanceDeGrados= 1
     #r = distaciaCam ; theta = gradosTheta ; fi = gradosFi
     return r, theta, fi"""
 
-def esfericoACartesiano(r,theta,fi):
-    x = r*sin(radians(theta))*cos(radians(fi))
-    y = r*cos(radians(theta))
-    z = r*sin(radians(theta))*sin(radians(fi))
+
+def esfericoACartesiano(r, theta, fi):
+    x = r * sin(radians(theta)) * cos(radians(fi))
+    y = r * cos(radians(theta))
+    z = r * sin(radians(theta)) * sin(radians(fi))
     return x, y, z
+
 
 class camara:
     def __init__(self):
@@ -54,13 +55,6 @@ class camara:
 
 
 class cuadrado:
-    def __init__(self):
-        self.cx = 0
-        self.cy = 0
-        self.cz = 0
-        self.size = 1
-        self.color = (1,0,1)
-
     def __init__(self, x, y, z, size, color):
         self.cx = x
         self.cy = y
@@ -70,8 +64,9 @@ class cuadrado:
         self.tx = 0
         self.ty = 0
         self.tz = 0
+
     def getTrans(self):
-        return self.tx,self.ty,self.tz
+        return self.tx, self.ty, self.tz
 
     def getCoordX(self):
         return self.cx
