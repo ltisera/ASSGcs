@@ -3,6 +3,7 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from math import *
 from auxiliares import dibujarCuadricula
+from mira import mira
 # el coso se encuentra a 129x 217y
 mPosXOld = None
 mPosYOld = None
@@ -21,20 +22,6 @@ gradosFi = 0
 distanciaCam = 0
 avanceDeGrados = 1
 
-"""def cartesianoAEsferico(x,y,z):
-    No funca
-    if (y!=0):
-        theta = degrees(atan(sqrt((pow(x,2)+pow(z,2))/y)))
-    else:
-        theta = 90
-    if(x!=0):
-        fi = degrees(atan(z/x))
-    else:
-        fi = 90
-    r = sqrt((x*x)+(y*y)+(z*z))
-    #r = distaciaCam ; theta = gradosTheta ; fi = gradosFi
-    return r, theta, fi"""
-
 
 def esfericoACartesiano(r, theta, fi):
     x = r * sin(radians(theta)) * cos(radians(fi))
@@ -48,13 +35,12 @@ class camara:
         self.xCam = 0.0
         self.yCam = 0.0
         self.zCam = 0.0
-        self.xPOI = 0.0
-        self.yPOI = 0.0
-        self.zPOI = 0.0
+        self.miMira = mira(0, 0, 0)
         self.anguloApertura = 45.0
 
 
 class cuadrado:
+
     def __init__(self, x, y, z, size, color):
         self.cx = x
         self.cy = y
@@ -316,9 +302,17 @@ if __name__ == "__main__":
     app = glutCreateWindow("test camara")
     inicializar()
 
+    miraTest = mira(0, 0, 0)
+    miraTest.xPos = 2
+    miraTest.yPos = 3
+    miraTest.zPos = -1
+
+    print("Ves que cambia: ", miraTest.getPos())
+
     miCuad = cuadrado(1, 1, 1, 1, (1, 1, 1))
 
     lstObjetos.append(miCuad)
+    lstObjetos.append(miraTest)
     glutDisplayFunc(dibujar)
     glutKeyboardFunc(keyboarEvent)
     glutSpecialFunc(keyboarEvent)

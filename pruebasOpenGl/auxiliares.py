@@ -4,10 +4,6 @@ from OpenGL.GLU import *
 from math import *
 
 
-def casa():
-    print("Estoy en casa")
-
-
 def dibujarCuadricula():
     glLineWidth(2.5)
     glColor3f(1, 0, 0)
