@@ -10,8 +10,17 @@ class mira:
         self.yPos = y
         self.zPos = z
         self.size = 1
+        self.visible = True
         self.lineWidth = 2
         self.color = (1, 0, 1)
+
+    @property
+    def visible(self):
+        return self.__visible
+
+    @visible.setter
+    def visible(self, visible):
+        self.__visible = visible
 
     @property
     def xPos(self):
@@ -46,13 +55,14 @@ class mira:
         self.zPos = vecPos[2]
 
     def dibujar(self):
-        glLineWidth(self.lineWidth)
-        glColor3f(self.color[0], self.color[1], self.color[2])
-        glBegin(GL_LINES)
-        glVertex3f(self.xPos - self.size, self.yPos, self.zPos)
-        glVertex3f(self.xPos + self.size, self.yPos, self.zPos)
-        glVertex3f(self.xPos, self.yPos - self.size, self.zPos)
-        glVertex3f(self.xPos, self.yPos + self.size, self.zPos)
-        glVertex3f(self.xPos, self.yPos, self.zPos - self.size)
-        glVertex3f(self.xPos, self.yPos, self.zPos + self.size)
-        glEnd()
+        if(self.visible):
+            glLineWidth(self.lineWidth)
+            glColor3f(self.color[0], self.color[1], self.color[2])
+            glBegin(GL_LINES)
+            glVertex3f(self.xPos - self.size, self.yPos, self.zPos)
+            glVertex3f(self.xPos + self.size, self.yPos, self.zPos)
+            glVertex3f(self.xPos, self.yPos - self.size, self.zPos)
+            glVertex3f(self.xPos, self.yPos + self.size, self.zPos)
+            glVertex3f(self.xPos, self.yPos, self.zPos - self.size)
+            glVertex3f(self.xPos, self.yPos, self.zPos + self.size)
+            glEnd()
