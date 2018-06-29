@@ -16,16 +16,9 @@ lstObjetos = []
 width = 800
 heigth = 500
 
-inCamX = 50
-inCamY = 50
-inCamZ = 50
-
-def esfericoACartesiano(r, Tita, fi):
-    x = r * sin(radians(Tita)) * cos(radians(fi))
-    y = r * cos(radians(Tita))
-    z = r * sin(radians(Tita)) * sin(radians(fi))
-    return x, y, z
-
+inCamX = -50
+inCamY = -50
+inCamZ = -50
 
 def inicializar(cam):
     global eyeX
@@ -80,41 +73,28 @@ def mouseClickEvent(mouse, state, x, y):
     if(mouse == GLUT_LEFT_BUTTON and state == GLUT_UP):
         mPosXOld = x
         mPosYOld = y
+    print("B")
 
 
 def mouseEvent(x, y):
     global mPosXOld
     global mPosYOld
-    gradosTita = 0
-    gradosPhi = 0
-    global distanciaCam
-    global eyeX
-    global eyeY
-    global eyeZ
-    global mx
-    global my
-    global mz
+    centerX = 800 / 2
+    centerY = 500 / 2
 
     dx = 0
     dy = 0
     if(mPosXOld is not None and mPosYOld is not None):
-        dx = x - mPosXOld
-        dy = -(y - mPosYOld)
-    else:
-        mPosXOld = x
-        mPosYOld = y
-    gradosTita += dy * 0.01
-    gradosPhi += dx * 0.01
-
-    if(gradosTita >= 360):
-        gradosTita = 0.1
-    if(gradosTita <= 0):
-        gradosTita = 360
-
-    cam.mirarA(dx, dy)
+        dx = x - centerX
+        dy = -(y - centerY)
+   
     mPosXOld = x
     mPosYOld = y
-
+    cam.mirarA(dx*0.1,dy*0.1)
+    
+    if (x != centerX or y != centerY):
+        glutWarpPointer(int(centerX), int(centerY))
+    
 
 def keyboarEvent(key, x, y):
     global lstObjetos
@@ -130,6 +110,14 @@ def keyboarEvent(key, x, y):
 
     if(key == GLUT_KEY_LEFT):
         cam.gradosTita -= 1
+
+    if(key == b'w'):
+        vdir = cam.vecUDireccion()
+        cam.mover(vdir[0], vdir[1], vdir[2])
+
+    if(key == b's'):
+        vdir = cam.vecUDireccion()
+        cam.mover(-vdir[0], -vdir[1], -vdir[2])
 
     cam.mirarA(0, 0)
     if(key == b'q'):
@@ -159,6 +147,7 @@ if __name__ == "__main__":
     glutSpecialFunc(keyboarEvent)
     glutMouseFunc(mouseClickEvent)
     glutMotionFunc(mouseEvent)
+    glutPassiveMotionFunc(mouseEvent)
     glutMainLoop()
 """
 v1 = eyeX-mx, eyeY-my,eyeZ-mz

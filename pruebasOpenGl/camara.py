@@ -26,10 +26,10 @@ class camara:
 
     @gradosPhi.setter
     def gradosPhi(self, gradosPhi):
-        if(gradosPhi < 0):
-            gradosPhi = 359
-        if(gradosPhi > 360):
-            gradosPhi = 1
+        if(gradosPhi < -90):
+            gradosPhi = -90
+        if(gradosPhi > 90):
+            gradosPhi = 90
         self._gradosPhi = gradosPhi
 
     @property
@@ -110,6 +110,20 @@ class camara:
         self.yCam += y
         self.zCam += z
 
+    def vecDireccion(self):
+        return (self.xMira - self.xCam,
+                self.yMira - self.yCam,
+                self.zMira - self.zCam)
+
+    def vecUDireccion(self):
+        cord = (self.xMira - self.xCam,
+                self.yMira - self.yCam,
+                self.zMira - self.zCam)
+        vrazon = sqrt(cord[0] * cord[0] +
+                      cord[1] * cord[1] +
+                      cord[2] * cord[2])
+        return (cord[0] / vrazon, cord[1] / vrazon, cord[2] / vrazon)
+
     def mirarA(self, Tita, fi):
         glLoadIdentity()
         self.gradosTita += Tita
@@ -121,13 +135,28 @@ class camara:
         self.yMira = nY
         self.zMira = nZ
 
-        gluLookAt(self.xCam, self.yCam, self.zCam,
-                  self.xMira, self.yMira, self.zMira,
-                  0, 1, 0)
-        print("gradosTita:{0} gradosPhi:{1} miraA:({2:.2f},{3:.2f},{4:.2f})".format(self.gradosTita, self.gradosPhi, self.xMira, self.yMira, self.zMira))
-
+        if(self.gradosPhi < 90):
+            gluLookAt(self.xCam, self.yCam, self.zCam,
+                      self.xMira, self.yMira, self.zMira,
+                      0, 1, 0)
+        else:
+            gluLookAt(self.xCam, self.yCam, self.zCam,
+                      self.xMira, self.yMira, self.zMira,
+                      0, 1, 0)
         glutPostRedisplay()
 
+        # dbgInf
+        
+        cadena = "gradosTita:{0} gradosPhi:{1} miraA:({2:.2f},{3:.2f},{4:.2f})"
+        print(cadena.format(self.gradosTita, self.gradosPhi,
+                            self.xMira, self.yMira, self.zMira))
+        
+    """
+    esfericoACartesiano(self, d, tita, phi):
+    Convierte de cordenadas esfericas 
+    (Distancia, gradVertical, Grad horizontal)
+    a coordenadas (x,y,z)
+    """
     def esfericoACartesiano(self, d, tita, phi):
         x = self.xCam + d * cos(radians(tita)) * cos(radians(phi))
         y = self.yCam + d * sin(radians(phi))
