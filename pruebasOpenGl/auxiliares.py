@@ -10,6 +10,9 @@ def dibujarCuadricula():
     glBegin(GL_LINES)
     glVertex3f(0.0, 0.0, 0.0)
     glVertex3f(100, 0, 0)
+    glVertex3f(0.0, 20, 0.0)
+    glVertex3f(100, 20, 0)
+
     glEnd()
 
     glColor3f(0.0, 1.0, 0.0)
