@@ -26,11 +26,11 @@ class camara:
 
     @gradosPhi.setter
     def gradosPhi(self, gradosPhi):
-        if(gradosPhi < -90):
-            gradosPhi = -90
-        if(gradosPhi > 90):
-            gradosPhi = 90
         self._gradosPhi = gradosPhi
+        if(gradosPhi < 0):
+            gradosPhi = 359
+        if(gradosPhi > 360):
+            gradosPhi = 1
 
     @property
     def gradosTita(self):
@@ -38,11 +38,11 @@ class camara:
 
     @gradosTita.setter
     def gradosTita(self, gradosTita):
+        self._gradosTita = gradosTita
         if(gradosTita < 0):
             gradosTita = 359
         if(gradosTita > 360):
             gradosTita = 1
-        self._gradosTita = gradosTita
 
     @property
     def xCam(self):
@@ -135,7 +135,7 @@ class camara:
         self.yMira = nY
         self.zMira = nZ
 
-        if(self.gradosPhi < 90):
+        if(self.gradosPhi < 180):
             gluLookAt(self.xCam, self.yCam, self.zCam,
                       self.xMira, self.yMira, self.zMira,
                       0, 1, 0)
@@ -146,17 +146,18 @@ class camara:
         glutPostRedisplay()
 
         # dbgInf
-        
+
         cadena = "gradosTita:{0} gradosPhi:{1} miraA:({2:.2f},{3:.2f},{4:.2f})"
         print(cadena.format(self.gradosTita, self.gradosPhi,
                             self.xMira, self.yMira, self.zMira))
-        
+
     """
     esfericoACartesiano(self, d, tita, phi):
-    Convierte de cordenadas esfericas 
+    convierte de cordenadas esfericas
     (Distancia, gradVertical, Grad horizontal)
     a coordenadas (x,y,z)
     """
+
     def esfericoACartesiano(self, d, tita, phi):
         x = self.xCam + d * cos(radians(tita)) * cos(radians(phi))
         y = self.yCam + d * sin(radians(phi))

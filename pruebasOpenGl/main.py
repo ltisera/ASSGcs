@@ -3,8 +3,8 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from math import *
 from auxiliares import dibujarCuadricula
-from mira import mira
 from cuadrado import cuadrado
+from cubo import cubo
 from camara import camara
 # el coso se encuentra a 129x 217y
 
@@ -19,6 +19,7 @@ heigth = 500
 inCamX = -50
 inCamY = -50
 inCamZ = -50
+
 
 def inicializar(cam):
     global eyeX
@@ -87,14 +88,14 @@ def mouseEvent(x, y):
     if(mPosXOld is not None and mPosYOld is not None):
         dx = x - centerX
         dy = -(y - centerY)
-   
+
     mPosXOld = x
     mPosYOld = y
-    cam.mirarA(dx*0.1,dy*0.1)
-    
+    cam.mirarA(dx * 0.1, dy * 0.1)
+
     if (x != centerX or y != centerY):
         glutWarpPointer(int(centerX), int(centerY))
-    
+
 
 def keyboarEvent(key, x, y):
     global lstObjetos
@@ -140,8 +141,10 @@ if __name__ == "__main__":
     inicializar(cam)
 
     miCuad = cuadrado(5, 1, 5, 1, (1, 1, 1))
+    miCubo = cubo(0, 0, 0, 100, ((1, 0.5, 0.5), (0.5, 1, 0.5), (0.5, 0.5, 1)))
 
     lstObjetos.append(miCuad)
+    lstObjetos.append(miCubo)
     glutDisplayFunc(dibujar)
     glutKeyboardFunc(keyboarEvent)
     glutSpecialFunc(keyboarEvent)
